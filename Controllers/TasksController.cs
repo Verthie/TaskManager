@@ -84,14 +84,14 @@ namespace TaskManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Tasks/Details
+        // GET: Tasks/Details/{id}
         [HttpGet]
         public async Task<IActionResult> Details(int id) // Displays Task Details
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
 
-            return View(task);
+            return PartialView("_TaskDetailsPartial", task);
         }
 
         // POST: Tasks/Complete/{id}

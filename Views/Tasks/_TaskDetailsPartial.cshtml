@@ -1,0 +1,7 @@
+@model TaskItem
+
+<div>
+	<strong>Title:</strong> @Model.Title <br>
+	<strong>Description:</strong> @Model.Description <br>
+	<strong>Completed:</strong> @(Model.CompletionStatus ? "Yes" : "No") <br>
+</div>

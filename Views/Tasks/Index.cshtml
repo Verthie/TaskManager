@@ -26,7 +26,8 @@
             <td>@(task.CompletionStatus ? "Yes" : "No")</td>
             <td>
                 @*:? Edit action expects an id parameter so we route it to the id of this model using asp-route-id *@
-                <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-info">Details</a>
+                <button type="button" class="btn btn-sm btn-info detailsBtn" data-task-id="@task.Id" data-toggle="modal"
+                    data-target="#detailsModal">Details</button>
                 <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-warning">Edit</a>
                 <a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">Remove</a>
                 @if (!task.CompletionStatus)
@@ -42,3 +43,63 @@
         </tr>
     }
 </table>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Task Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <!-- Task details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const timeout = function (s) {
+        return new Promise(function (_, reject) {
+            setTimeout(function () {
+                reject(new Error(`Request took too long! Timeout after ${s} second`));
+            }, s * 1000);
+        });
+    };
+
+    const getData = async function (taskId) {
+        const res = await Promise.race([fetch(`/Tasks/Details/${taskId}`), timeout(10)]);
+        const data = await res.text();
+
+        if (!res.ok) throw new Error(`Error (${res.status})`);
+        return data;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const detailsBtn = document.querySelector('.detailsBtn');
+        const modalBody = document.querySelector('.modal-body');
+        const modal = document.getElementById('detailsModal');
+
+        // Attach click listener to all details buttons
+        document.querySelectorAll('.detailsBtn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                currentTaskId = button.getAttribute('data-task-id');
+                // const bootstrapModal = new bootstrap.Modal(modal);
+                // bootstrapModal.show();
+                $('#detailsModal').modal('show')
+            });
+        });
+
+        // On modal show, fetch and inject details for the selected task
+        modal.addEventListener('show.bs.modal', async function () {
+            if (!currentTaskId) return;
+
+            try {
+                const data = await getData(currentTaskId);
+                modalBody.innerHTML = data;
+            } catch (err) {
+                modalBody.innerHTML = `<div class="text-danger">${err.message}</div>`;
+            }
+        });
+    });
+</script>
