@@ -5,31 +5,25 @@ using TaskManager.Models;
 
 namespace TaskManager.Controllers
 {
-    public class TasksController : Controller
+    public class TasksController(AppDbContext _context) : Controller
     {
-        private readonly AppDbContext _context;
-
-        public TasksController(AppDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: Tasks
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() // Displays Starting Page
         {
             List<TaskItem> tasks = await _context.Tasks.ToListAsync();
             return View(tasks);
+            //:* Return View when you want to display a page, usually on GET requests or when form validation fails (showing the form again with errors).
         }
 
-        // GET: Tasks/ShowCreateForm
+        // GET: Tasks/Create
         [HttpGet]
-        public IActionResult ShowCreateForm() => View();
+        public IActionResult Create() => View(); // Displays Task Create Form
 
         // POST: Tasks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TaskItem task)
+        public async Task<IActionResult> Create(TaskItem task) // Performs Task Post Operation
         {
             //:? When the TaskItem model provided by user is invalid we return View with the task provided so that we can return validation messages
             //:* This only works with models that have some fields defined as 'required' or with a certain length and etc., in this case TaskItem requires at least a title before its creation 
@@ -37,12 +31,14 @@ namespace TaskManager.Controllers
 
             await _context.Tasks.AddAsync(task);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
+            //:* Redirect after a successful POST operation (like Create, Edit, or Delete) to avoid resubmitting the form if the user refreshes and to navigate to another page (typically the list/index page).
         }
 
-        // GET: Tasks/Update/{id}
+        // GET: Tasks/Edit/{id}
         [HttpGet] //:? HTML Forms don't support PUT and DELETE operations so if we are not doing an API we can only use GET and POST
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id) // Displays Edit Form
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
@@ -50,22 +46,23 @@ namespace TaskManager.Controllers
             return View(task);
         }
 
-        // POST: Tasks/Update/{id}
+        // POST: Tasks/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TaskItem task)
+        public async Task<IActionResult> Edit(int id, TaskItem task) // Performs Task Update Operation
         {
             if (id != task.Id) return NotFound();
             if (!ModelState.IsValid) return View(task);
 
-            await _context.Tasks.AddAsync(task);
+            _context.Tasks.Update(task);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Tasks/Delete/{id}
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id) // Displays Delete Form
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
@@ -76,7 +73,7 @@ namespace TaskManager.Controllers
         // POST: Tasks/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id) // Performs Task Deletion Operation
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
@@ -89,12 +86,28 @@ namespace TaskManager.Controllers
 
         // GET: Tasks/Details
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id) // Displays Task Details
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
 
             return View(task);
+        }
+
+        // POST: Tasks/Complete/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Complete(int id) // Performs Task Completion Operation
+        {
+            TaskItem? task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
+
+            task.CompletionStatus = true;
+
+            _context.Tasks.Update(task);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

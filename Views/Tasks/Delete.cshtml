@@ -1,0 +1,19 @@
+﻿@model TaskItem
+
+@{
+    ViewData["Title"] = "Delete Form";
+}
+
+<h2>Delete Task?</h2>
+
+<h4>Title: @Model.Title</h4>
+<h4>Description: @Model.Description</h4>
+<h4>Completion Status: @Model.CompletionStatus</h4>
+
+<div class="form-group mt-3">
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </form>
+</div>

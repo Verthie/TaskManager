@@ -1,7 +1,44 @@
-﻿@{
+﻿@model IEnumerable<TaskItem>;
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<h2>Index</h2>
+<h1>Task List</h1>
 
-<p>Hello from our View Template!</p>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Task</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            @* <th>Description</th> *@
+            <th>Is Complete</th>
+            <th></th>
+        </tr>
+    </thead>
+    @foreach (TaskItem task in Model)
+    {
+        <tr>
+            <td>@task.Title</td>
+            @* <td>@task.Description</td> *@
+            <td>@(task.CompletionStatus ? "Yes" : "No")</td>
+            <td>
+                @*:? Edit action expects an id parameter so we route it to the id of this model using asp-route-id *@
+                <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-info">Details</a>
+                <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-warning">Edit</a>
+                <a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">Remove</a>
+                @if (!task.CompletionStatus)
+                {
+                    @* :* <a> is designed for navigation (GET requests) so we can't make POST requests with them *@
+                    @* <a asp-action="Complete" asp-route-id="@task.Id" class="btn btn-sm btn-success">Complete</a> *@
+
+                    <form asp-action="Complete" asp-route-id="@task.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-success">Complete</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+</table>
