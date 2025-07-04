@@ -97,17 +97,17 @@ namespace TaskManager.Controllers
         // POST: Tasks/Complete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Complete(int id) // Performs Task Completion Operation
+        public async Task<IActionResult> ToggleStatus(int id) // Performs Task Toggle Operation
         {
             TaskItem? task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
 
-            task.CompletionStatus = true;
+            task.CompletionStatus = !task.CompletionStatus;
 
             _context.Tasks.Update(task);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return Ok(); // No redirect needed for AJAX
         }
     }
 }

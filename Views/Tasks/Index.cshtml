@@ -23,22 +23,29 @@
         <tr>
             <td>@task.Title</td>
             @* <td>@task.Description</td> *@
-            <td>@(task.CompletionStatus ? "Yes" : "No")</td>
+            <td>
+                @Html.AntiForgeryToken()
+                <input data-id=@task.Id class="form-check-input" type="checkbox" onchange="toggleTask(event, @task.Id)" @(task.CompletionStatus ?
+                                                                                                                                                "checked" : "") />
+            </td>
             <td>
                 @*:? Edit action expects an id parameter so we route it to the id of this model using asp-route-id *@
                 <button type="button" class="btn btn-sm btn-info detailsBtn" data-task-id="@task.Id" data-toggle="modal"
                     data-target="#detailsModal">Details</button>
                 <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-warning">Edit</a>
                 <a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">Remove</a>
-                @if (!task.CompletionStatus)
-                {
+                @* @if (!task.CompletionStatus) *@
+                @* { *@
                     @* :* <a> is designed for navigation (GET requests) so we can't make POST requests with them *@
                     @* <a asp-action="Complete" asp-route-id="@task.Id" class="btn btn-sm btn-success">Complete</a> *@
 
-                    <form asp-action="Complete" asp-route-id="@task.Id" method="post" style="display:inline;">
+                    @* <form asp-action="Complete" asp-route-id="@task.Id" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-success">Complete</button>
-                    </form>
-                }
+                    </form> *@
+                @* } *@
+            </td>
+            <td>
+                <span id="badge-@task.Id" class="badge @(task.CompletionStatus ? "bg-success" : "bg-secondary")">@(task.CompletionStatus ? "Complete" : "Incomplete")</span>
             </td>
         </tr>
     }
@@ -102,4 +109,38 @@
             }
         });
     });
+
+    const toggleTask = async function(e, id) {
+        e.preventDefault();
+        
+        const checkbox = document.querySelector(`input[data-id="${id}"]`);
+        const status = checkbox.checked;
+
+        const formData = new URLSearchParams();
+        formData.append("id", id); // same as adding an id parameter to a URL => /Tasks/Complete?id=${id}
+
+        const res = await fetch(`/Tasks/ToggleStatus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded', // Notice that the Content-Type is not 'application/json' (we are not POSTing json)
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: formData
+        });
+
+        if (!res.ok) alert("Failed to update task.");
+        else await toggleBadge(id, status);
+    }
+
+    const toggleBadge = async function(id, status) {
+        // Update badge UI
+        const badge = document.getElementById(`badge-${id}`);
+        if (status) {
+            badge.className = "badge bg-success";
+            badge.innerText = "Complete";
+        } else {
+            badge.className = "badge bg-secondary";
+            badge.innerText = "Incomplete";
+        }
+    }
 </script>
