@@ -5,9 +5,35 @@
 
 <h1>Task List</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New Task</a>
-</p>
+<div class="container">
+    <div class="row justify-content-between">
+        <div class="col-2 p-0">
+            <a asp-action="Create" class="btn btn-primary">Create New Task</a>
+        </div>
+        <div class="col-2 p-0 d-flex justify-content-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Status Filter
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a asp-action="Index" asp-route-statusFilter="Complete" class="dropdown-item">Complete</a></li>
+                    <li><a asp-action="Index" asp-route-statusFilter="Incomplete" class="dropdown-item">Incomplete</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a asp-action="Index" class="dropdown-item">All</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <p>
+    <table class="table">
+        <a asp-action="Create" class="btn btn-primary">Create New Task</a>
+        <a asp-action="Create" class="btn btn-primary">Create New Task</a>
+    </table>
+</p> *@
 
 <table class="table table-striped">
     <thead>
@@ -129,7 +155,7 @@
         });
 
         if (!res.ok) alert("Failed to update task.");
-        else await toggleBadge(id, status);
+        await toggleBadge(id, status);
     }
 
     const toggleBadge = async function(id, status) {

@@ -9,9 +9,21 @@ namespace TaskManager.Controllers
     {
         // GET: Tasks
         [HttpGet]
-        public async Task<IActionResult> Index() // Displays Starting Page
+        public async Task<IActionResult> Index(string? statusFilter = null) // Displays Starting Page
         {
-            List<TaskItem> tasks = await _context.Tasks.ToListAsync();
+            IQueryable<TaskItem> query = _context.Tasks;
+
+            if (statusFilter == "Complete")
+            {
+                query = query.Where(t => t.CompletionStatus);
+            }
+            else if (statusFilter == "Incomplete")
+            {
+                query = query.Where(t => !t.CompletionStatus);
+            }
+
+            List<TaskItem> tasks = await query.ToListAsync();
+
             return View(tasks);
             //:* Return View when you want to display a page, usually on GET requests or when form validation fails (showing the form again with errors).
         }
