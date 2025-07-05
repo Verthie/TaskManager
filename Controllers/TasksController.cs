@@ -13,14 +13,12 @@ namespace TaskManager.Controllers
         {
             IQueryable<TaskItem> query = _context.Tasks;
 
-            if (statusFilter == "Complete")
+            query = statusFilter switch
             {
-                query = query.Where(t => t.CompletionStatus);
-            }
-            else if (statusFilter == "Incomplete")
-            {
-                query = query.Where(t => !t.CompletionStatus);
-            }
+                "Complete" => query.Where(t => t.CompletionStatus),
+                "Incomplete" => query.Where(t => !t.CompletionStatus),
+                _ => query
+            };
 
             List<TaskItem> tasks = await query.ToListAsync();
 
