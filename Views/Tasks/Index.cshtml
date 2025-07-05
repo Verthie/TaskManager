@@ -38,9 +38,15 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Title</th>
+            <th>
+                Title
+                @* <a asp-action="Index" asp-route-sortProperty="Title">Title</a> Sorting by Title*@
+            </th>
             @* <th>Description</th> *@
-            <th>Is Complete</th>
+            <th>
+                Check
+                @* <a asp-action="Index" asp-route-sortProperty="Status">Is Complete</a> Sorting by Status*@
+            </th>
             <th></th>
         </tr>
     </thead>

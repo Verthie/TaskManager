@@ -9,7 +9,7 @@ namespace TaskManager.Controllers
     {
         // GET: Tasks
         [HttpGet]
-        public async Task<IActionResult> Index(string? statusFilter = null) // Displays Starting Page
+        public async Task<IActionResult> Index(string? statusFilter = null /*, string? sortProperty = null */) // Displays Starting Page
         {
             IQueryable<TaskItem> query = _context.Tasks;
 
@@ -19,6 +19,19 @@ namespace TaskManager.Controllers
                 "Incomplete" => query.Where(t => !t.CompletionStatus),
                 _ => query
             };
+
+            // Sorting
+            /* 
+            switch (sortProperty)
+            {
+                case "Title":
+                    query = query.OrderBy(t => t.Title);
+                    break;
+                case "Status":
+                    query = query.OrderBy(t => t.CompletionStatus);
+                    break;
+            }
+            */
 
             List<TaskItem> tasks = await query.ToListAsync();
 
