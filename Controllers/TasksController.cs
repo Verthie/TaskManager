@@ -9,10 +9,11 @@ namespace TaskManager.Controllers
     {
         // GET: Tasks
         [HttpGet]
-        public async Task<IActionResult> Index(string? statusFilter = null /*, string? sortProperty = null */) // Displays Starting Page
+        public async Task<IActionResult> Index(string? statusFilter = null, string? sortProperty = null, string? sortDirection = "") // Displays Starting Page
         {
             IQueryable<TaskItem> query = _context.Tasks;
 
+            // Filtering
             query = statusFilter switch
             {
                 "Complete" => query.Where(t => t.CompletionStatus),
@@ -21,17 +22,47 @@ namespace TaskManager.Controllers
             };
 
             // Sorting
-            /* 
-            switch (sortProperty)
+            // query = sortProperty switch
+            // {
+            //     "Title" => query = sortDirection switch
+            //     {
+            //         "asc" => query.OrderBy(t => t.Title),
+            //         "desc" => query.OrderByDescending(t => t.Title),
+            //         _ => query,
+            //     },
+            //     "Status" => query = sortDirection switch
+            //     {
+            //         "asc" => query.OrderBy(t => t.CompletionStatus),
+            //         "desc" => query.OrderByDescending(t => t.CompletionStatus),
+            //         _ => query,
+            //     },
+            //     "DueDate" => query = sortDirection switch
+            //     {
+            //         "asc" => query.OrderBy(t => t.DueDate),
+            //         "desc" => query.OrderByDescending(t => t.DueDate),
+            //         _ => query,
+            //     },
+            //     _ => query
+            // };
+
+            query = sortDirection switch
             {
-                case "Title":
-                    query = query.OrderBy(t => t.Title);
-                    break;
-                case "Status":
-                    query = query.OrderBy(t => t.CompletionStatus);
-                    break;
-            }
-            */
+                "asc" => query = sortProperty switch
+                {
+                    "Title" => query.OrderBy(t => t.Title),
+                    "Status" => query.OrderBy(t => t.CompletionStatus),
+                    "DueDate" => query.OrderBy(t => t.DueDate),
+                    _ => query,
+                },
+                "desc" => query = sortProperty switch
+                {
+                    "Title" => query.OrderByDescending(t => t.Title),
+                    "Status" => query.OrderByDescending(t => t.CompletionStatus),
+                    "DueDate" => query.OrderByDescending(t => t.DueDate),
+                    _ => query,
+                },
+                _ => query
+            };
 
             List<TaskItem> tasks = await query.ToListAsync();
 

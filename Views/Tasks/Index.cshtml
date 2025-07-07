@@ -3,6 +3,30 @@
     ViewData["Title"] = "Home Page";
 }
 
+@{
+    string sortProperty = ViewContext.HttpContext.Request.Query["sortProperty"].ToString();
+    string sortDirection = ViewContext.HttpContext.Request.Query["sortDirection"].ToString();
+    string statusFilter = ViewContext.HttpContext.Request.Query["statusFilter"].ToString();
+}
+
+@functions {
+    string SortIcon(string column, string sortProperty, string sortDirection)
+    {
+        if (column != sortProperty) return "";
+        else if (sortDirection == "asc") return "↑";
+        else if (sortDirection == "desc") return "↓";
+        return "";
+        // return sortDirection == "asc" ? "↑" : "↓";
+    }
+
+    string NextDirection(string column, string sortProperty, string sortDirection)
+    {
+        if (column != sortProperty || ( column == sortProperty && sortDirection == "" )) return "asc";
+        else if (sortDirection == "asc") return "desc";
+        return "";
+    }
+}
+
 <h1>Task List</h1>
 
 <div class="container">
@@ -28,24 +52,28 @@
     </div>
 </div>
 
-@* <p>
-    <table class="table">
-        <a asp-action="Create" class="btn btn-primary">Create New Task</a>
-        <a asp-action="Create" class="btn btn-primary">Create New Task</a>
-    </table>
-</p> *@
-
 <table class="table table-striped">
     <thead>
         <tr>
             <th>
-                Title
-                @* <a asp-action="Index" asp-route-sortProperty="Title">Title</a> Sorting by Title*@
+                <a asp-action="Index" asp-route-sortProperty="Title" asp-route-sortDirection="@NextDirection("Title", sortProperty, sortDirection)"
+                    asp-route-statusFilter="@statusFilter">
+                    Title @Html.Raw(SortIcon("Title", sortProperty, sortDirection))
+                </a>
             </th>
             @* <th>Description</th> *@
             <th>
-                Check
-                @* <a asp-action="Index" asp-route-sortProperty="Status">Is Complete</a> Sorting by Status*@
+                <a asp-action="Index" asp-route-sortProperty="Status" asp-route-sortDirection="@NextDirection("Status", sortProperty, sortDirection)"
+                    asp-route-statusFilter="@statusFilter">
+                    Check @Html.Raw(SortIcon("Status", sortProperty, sortDirection))
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortProperty="DueDate"
+                    asp-route-sortDirection="@NextDirection("DueDate", sortProperty, sortDirection)"
+                    asp-route-statusFilter="@statusFilter">
+                    Due Date @Html.Raw(SortIcon("DueDate", sortProperty, sortDirection))
+                </a>
             </th>
             <th></th>
         </tr>
@@ -60,6 +88,7 @@
                 <input data-id=@task.Id class="form-check-input" type="checkbox" onchange="toggleTask(event, @task.Id)" @(task.CompletionStatus ?
                                                                                                                                                 "checked" : "") />
             </td>
+            <td>@task.DueDate</td>
             <td>
                 @*:? Edit action expects an id parameter so we route it to the id of this model using asp-route-id *@
                 <button type="button" class="btn btn-sm btn-info detailsBtn" data-task-id="@task.Id" data-toggle="modal"

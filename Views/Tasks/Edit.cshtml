@@ -12,10 +12,17 @@
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
+
     <div>
         <label asp-for="Description"></label>
         <input asp-for="Description" class="form-control" />
     </div>
+
+    <div>
+        <label asp-for="DueDate"></label>
+        <input asp-for="DueDate" class="form-control" />
+    </div>
+
     <div>
         <label asp-for="CompletionStatus">Completion Status</label>
         <select asp-for="CompletionStatus" class="form-control">

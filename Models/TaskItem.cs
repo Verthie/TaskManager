@@ -10,4 +10,5 @@ public class TaskItem
 	[MaxLength(60)]
 	public string? Description { get; set; }
 	public bool CompletionStatus { get; set; } = false;
+	public DateTime? DueDate { get; set; }
 }
