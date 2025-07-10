@@ -22,29 +22,6 @@ namespace TaskManager.Controllers
             };
 
             // Sorting
-            // query = sortProperty switch
-            // {
-            //     "Title" => query = sortDirection switch
-            //     {
-            //         "asc" => query.OrderBy(t => t.Title),
-            //         "desc" => query.OrderByDescending(t => t.Title),
-            //         _ => query,
-            //     },
-            //     "Status" => query = sortDirection switch
-            //     {
-            //         "asc" => query.OrderBy(t => t.CompletionStatus),
-            //         "desc" => query.OrderByDescending(t => t.CompletionStatus),
-            //         _ => query,
-            //     },
-            //     "DueDate" => query = sortDirection switch
-            //     {
-            //         "asc" => query.OrderBy(t => t.DueDate),
-            //         "desc" => query.OrderByDescending(t => t.DueDate),
-            //         _ => query,
-            //     },
-            //     _ => query
-            // };
-
             query = sortDirection switch
             {
                 "asc" => query = sortProperty switch
